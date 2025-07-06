@@ -1,0 +1,6 @@
+
+{
+  "discord_token": "MTM0MjE5NjU2MDM4MDk1Mjc2OA.GFa33L.54I0QRMBweE0mRRJ26vL-dJQCSc675uL0XpCzM",
+  "glm4_api_key": "c2f17de3392f4644a4fd38e80755404e.dv2QrxPrqxOKnh4F",
+  "glm4_endpoint": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+}

@@ -1,0 +1,8 @@
+
+{
+  "discord_token": "SEU_TOKEN_DO_BOT_MANAGER_AQUI",
+  "glm4_api_key": "SUA_API_KEY_GLM4_AQUI",
+  "glm4_endpoint": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+  "auto_update": true,
+  "update_server": "https://seuservidor.com"
+}

@@ -1,0 +1,45 @@
+{
+  "name": "gratian-manager-pro",
+  "version": "1.0.0",
+  "description": "Sistema Avançado de Gerenciamento de Múltiplos Bots Discord com IA integrada",
+  "main": "g-manager.js",
+  "scripts": {
+    "start": "node g-manager.js",
+    "dev": "node g-manager.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "manager",
+    "discord.js",
+    "ai",
+    "glm-4",
+    "bot-management",
+    "automation",
+    "multiple-bots"
+  ],
+  "author": {
+    "name": "Seu Nome",
+    "email": "seuemail@exemplo.com",
+    "url": "https://github.com/seuusuario"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seuusuario/gratian-manager-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seuusuario/gratian-manager-pro/issues"
+  },
+  "homepage": "https://github.com/seuusuario/gratian-manager-pro#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "axios": "^1.7.9",
+    "discord.js": "^14.16.3",
+    "fs-extra": "^11.2.0"
+  }
+}
