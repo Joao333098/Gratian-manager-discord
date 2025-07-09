@@ -333,5 +333,5 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ---
 
-**Desenvolvido com ❤️ para a comunidade Discord**
+**Desenvolvido vovo666 amor muito amor ❤️ para a comunidade Discord**
 
