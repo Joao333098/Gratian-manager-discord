@@ -207,8 +207,7 @@ Contributors são listados no README.md e recebem:
 
 ## 📞 Contato
 
-- **Discord**: [Server de Desenvolvimento](https://discord.gg/seuservidor)
-- **Email**: contato@seusite.com
+- **Discord**: [Server de Desenvolvimento]([https://discord.gg/seuservidor](https://discord.gg/uDQfeDnhYF))
 - **GitHub Issues**: Para bugs e features
 - **GitHub Discussions**: Para perguntas gerais
 
