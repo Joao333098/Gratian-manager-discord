@@ -312,7 +312,7 @@ meubot.zip
 ### Diretrizes
 - 📝 Documente novas funcionalidades
 - 🧪 Teste antes de enviar
-- 🎨 Mantenha o padrão de código
+- 🎨 [Mantenha o padrão de código](https://github.com/Gratian-pro/gratian-manager/blob/main/README.md)
 - 📋 Atualize o README se necessário
 
 ### Issues e Sugestões
