@@ -316,9 +316,9 @@ meubot.zip
 - 📋 Atualize o README se necessário
 
 ### Issues e Sugestões
-- 🐛 [Reportar Bug](https://github.com/seuusuario/gratian-manager/issues)
-- 💡 [Sugerir Feature](https://github.com/seuusuario/gratian-manager/issues)
-- ❓ [Fazer Pergunta](https://github.com/seuusuario/gratian-manager/discussions)
+- 🐛 [Reportar Bug](https://discord.gg/uDQfeDnhYF)
+- 💡 [LINK DO SITE](https://github.com/seuusuario/gratian-manager/issues)
+- ❓ [painel link](https://dashboard.gratian.pro/profile)
 
 ## 📄 Licença
 
@@ -326,10 +326,10 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 🎉 Agradecimentos
 
-- Discord.js Community
-- GLM-4 AI Platform
-- Node.js Foundation
-- Contribuidores do projeto
+- [doc gratian](https://docs.gratian.pro/)
+- [status gratian](https://status.gratian.pro/) 
+- [gratian](https://gratian.pro/)
+- [TERMOS](https://gratian.pro/terms)
 
 ---
 
