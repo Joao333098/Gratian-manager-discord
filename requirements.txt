@@ -1,0 +1,11 @@
+colorama
+discum
+discord.py
+flask
+httpx
+pyyaml
+pymongo
+requests
+requests-toolbelt
+ua-parser
+websocket-client

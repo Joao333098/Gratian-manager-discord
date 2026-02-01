@@ -1,0 +1,6 @@
+discum
+pyyaml
+requests
+httpx
+pymongo
+pymongo[srv]
