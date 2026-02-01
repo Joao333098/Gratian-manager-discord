@@ -1,19 +1,16 @@
 import discord
 import time
-from events.logs_system import stats
+from events.log_system import stats
 from functions.utils import BackButton
-from events.system_manager import system_running
+from events.runner_system import system_running
+from events.token_system import get_all_tokens
 
 class ViewLogsButton(discord.ui.Button):
     def __init__(self):
         super().__init__(label="Logs", style=discord.ButtonStyle.secondary, emoji="📊")
 
     async def callback(self, interaction: discord.Interaction):
-        try:
-            with open('config/tokens.txt', 'r') as f:
-                token_count = len([line for line in f.readlines() if line.strip()])
-        except:
-            token_count = 0
+        token_count = len(get_all_tokens())
 
         guilds_count = len(interaction.client.guilds) if interaction.client and hasattr(interaction.client, 'guilds') else 0
 

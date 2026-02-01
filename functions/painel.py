@@ -1,14 +1,14 @@
 import discord
 import time
 import asyncio
-from events.logs_system import stats
-from events.system_manager import start_dm_system, system_running, dm_tasks
-from events.token_system import validate_token_api, get_id
+from events.log_system import stats
+from events.runner_system import start_dm_system, system_running, dm_tasks
+from events.token_system import validate_token_api, get_id, get_all_tokens
 from functions.tokens import TokenButton
-from functions.mensagem import MessageButton, ServerMessageButton
-from functions.settings import SettingsButton
-from functions.log import ViewLogsButton
-from functions.permissions import PermissionButton, check_permission, is_owner
+from functions.mensagens import MessageButton, ServerMessageButton
+from functions.configuracao import SettingsButton
+from functions.logs import ViewLogsButton
+from functions.permissoes import PermissionButton, check_permission, is_owner
 from functions.utils import BackButton
 
 class StartButton(discord.ui.Button):
@@ -17,7 +17,7 @@ class StartButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         global system_running, dm_tasks
-        from events.system_manager import system_running as is_running # Import updated status
+        from events.runner_system import system_running as is_running
 
         try:
             if is_running:
@@ -32,8 +32,7 @@ class StartButton(discord.ui.Button):
                 await interaction.response.edit_message(embed=embed, view=buttons)
                 return
 
-            with open('config/tokens.txt', 'r') as f:
-                tokens = [token.strip() for token in f.readlines() if token.strip()]
+            tokens = get_all_tokens()
 
             if not tokens:
                 embed = discord.Embed(
@@ -85,9 +84,8 @@ class StartButton(discord.ui.Button):
                 await interaction.edit_original_response(embed=embed, view=buttons)
                 return
 
-            # Need to update system_running in events module
-            from events import system_manager
-            system_manager.system_running = True
+            from events import runner_system
+            runner_system.system_running = True
             stats.add_log(f"🚀 Iniciando sistema com {len(valid_tokens)} tokens válidos")
             stats.set_system_status(True)
 
@@ -136,10 +134,10 @@ class StopButton(discord.ui.Button):
         super().__init__(label="Parar", style=discord.ButtonStyle.danger, emoji=emoji)
 
     async def callback(self, interaction: discord.Interaction):
-        from events import system_manager
+        from events import runner_system
 
         try:
-            if not system_manager.system_running:
+            if not runner_system.system_running:
                 embed = discord.Embed(
                     title="⚠️ Sistema já está parado",
                     description="O sistema não está em execução!"
@@ -150,7 +148,7 @@ class StopButton(discord.ui.Button):
                 await interaction.response.edit_message(embed=embed, view=buttons)
                 return
 
-            system_manager.system_running = False
+            runner_system.system_running = False
             stats.set_system_status(False)
 
             for task in dm_tasks:
@@ -265,17 +263,13 @@ async def painel_command(interaction: discord.Interaction, client):
         await interaction.response.send_message("Você não tem permissão para usar este comando.", ephemeral=True)
         return
 
-    try:
-        with open('config/tokens.txt', 'r') as f:
-            token_count = len(f.readlines())
-    except:
-        token_count = 0
+    token_count = len(get_all_tokens())
 
     ping = round(client.latency * 1000)
     status_color = "Online" if ping < 200 else "Instável" if ping < 500 else "Alto Delay"
 
-    # Import system_running from events.system_manager
-    from events.system_manager import system_running
+    # Import system_running from events.runner_system
+    from events.runner_system import system_running
 
     embed = discord.Embed(
         title="Painel de Controle do Bot",

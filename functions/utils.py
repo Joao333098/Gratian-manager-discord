@@ -1,7 +1,8 @@
 import discord
 import requests
 import yaml
-from events.logs_system import stats
+from events.log_system import stats
+from events.token_system import get_all_tokens
 
 class BackButton(discord.ui.Button):
     def __init__(self):
@@ -9,16 +10,12 @@ class BackButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         from functions.painel import ModernPainelView
-        from functions.permissions import is_owner
-        from events.system_manager import system_running
+        from events.permission_system import is_owner
+        from events.runner_system import system_running
 
         client = interaction.client
 
-        try:
-            with open('config/tokens.txt', 'r') as f:
-                token_count = len([line for line in f.readlines() if line.strip()])
-        except:
-            token_count = 0
+        token_count = len(get_all_tokens())
 
         ping = round(client.latency * 1000)
         status_color = "Online" if ping < 200 else "Instável" if ping < 500 else "Alto Delay"
@@ -146,5 +143,4 @@ class EmojiManager:
             stats.add_log(f"Emoji {name}: {emoji}")
         stats.add_log("Configuração de emojis concluída!")
 
-# Global emoji manager instance, will be set by bot_controller
 emoji_manager = None

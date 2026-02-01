@@ -1,17 +1,13 @@
 import discord
 from functions.utils import BackButton
-from events.token_system import get_id
+from events.token_system import get_id, get_all_tokens, add_token, save_tokens
 
 class TokenButton(discord.ui.Button):
     def __init__(self, emoji="🗝️"):
         super().__init__(label="Tokens", style=discord.ButtonStyle.secondary, emoji=emoji)
 
     async def callback(self, interaction: discord.Interaction):
-        try:
-            with open('config/tokens.txt', 'r') as f:
-                tokens = f.read().splitlines()
-        except FileNotFoundError:
-            tokens = []
+        tokens = get_all_tokens()
 
         embed = discord.Embed(
             title="🔑 Gerenciamento de Tokens",
@@ -43,11 +39,7 @@ class RemoveTokenButton(discord.ui.Button):
         super().__init__(label="Remover", style=discord.ButtonStyle.danger, emoji="❌")
 
     async def callback(self, interaction: discord.Interaction):
-        try:
-            with open('config/tokens.txt', 'r') as f:
-                tokens = [token.strip() for token in f.readlines() if token.strip()]
-        except FileNotFoundError:
-            tokens = []
+        tokens = get_all_tokens()
 
         if not tokens:
             embed = discord.Embed(
@@ -72,8 +64,7 @@ class ClearTokensButton(discord.ui.Button):
         super().__init__(label="Limpar", style=discord.ButtonStyle.danger, emoji="🧹")
 
     async def callback(self, interaction: discord.Interaction):
-        with open('config/tokens.txt', 'w') as f:
-            f.write("")
+        save_tokens([])
 
         embed = discord.Embed(
             title="✅ Sucesso",
@@ -91,8 +82,7 @@ class AddTokenModal(discord.ui.Modal, title='Adicionar Token'):
     async def on_submit(self, interaction: discord.Interaction):
         token = self.token.value.strip()
         if token:
-            with open('config/tokens.txt', 'a') as f:
-                f.write(f"{token}\n")
+            add_token(token)
             await interaction.response.send_message(f"Token adicionado com sucesso!", ephemeral=True)
         else:
              await interaction.response.send_message(f"Token vazio!", ephemeral=True)
@@ -164,14 +154,9 @@ class ConfirmRemovalView(discord.ui.View):
     @discord.ui.button(label="✅ Confirmar Remoção", style=discord.ButtonStyle.danger)
     async def confirm_removal(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
-            with open('config/tokens.txt', 'r') as f:
-                all_tokens = [token.strip() for token in f.readlines() if token.strip()]
-
+            all_tokens = get_all_tokens()
             remaining_tokens = [token for token in all_tokens if token not in self.tokens_to_remove]
-
-            with open('config/tokens.txt', 'w') as f:
-                for token in remaining_tokens:
-                    f.write(f"{token}\n")
+            save_tokens(remaining_tokens)
 
             embed = discord.Embed(
                 title="✅ Tokens Removidos",
@@ -222,8 +207,7 @@ class ConfirmRemoveAllView(discord.ui.View):
 
     @discord.ui.button(label="🗑️ SIM, REMOVER TODOS", style=discord.ButtonStyle.danger)
     async def confirm_remove_all(self, interaction: discord.Interaction, button: discord.ui.Button):
-        with open('config/tokens.txt', 'w') as f:
-            f.write("")
+        save_tokens([])
 
         embed = discord.Embed(
             title="✅ Todos os Tokens Removidos",

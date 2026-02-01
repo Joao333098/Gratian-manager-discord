@@ -4,9 +4,10 @@ import threading
 import time
 import os
 import functions.utils
-from events.logs_system import stats
+from events.log_system import stats
 from functions.painel import painel_command
-from functions.permissions import check_permission, is_owner
+from events.permission_system import is_owner
+from events.config_system import load_settings
 
 class BotController(discord.Client):
     def __init__(self):

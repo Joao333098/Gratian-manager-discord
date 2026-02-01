@@ -1,32 +1,6 @@
 import discord
-import json
 from functions.utils import BackButton
-
-def is_owner(user_id):
-    try:
-        with open('data/config.json', 'r') as f:
-            config = json.load(f)
-
-        with open('data/perm.json', 'r') as f:
-            perm = json.load(f)
-
-        return user_id == config.get('ownerID') or str(user_id) in perm.get('owners', [])
-    except Exception as e:
-        print(f"Erro ao verificar se é dono: {e}")
-        return False
-
-def check_permission(user_id):
-    try:
-        with open('data/config.json', 'r') as f:
-            config = json.load(f)
-
-        with open('data/perm.json', 'r') as f:
-            perm = json.load(f)
-
-        return user_id == config.get('ownerID') or str(user_id) in perm.get('owners', []) or str(user_id) in perm.get('permitted', [])
-    except Exception as e:
-        print(f"Erro ao verificar permissões: {e}")
-        return False
+from events.permission_system import is_owner, check_permission, get_owners, get_permitted, add_permission, remove_permission
 
 class PermissionButton(discord.ui.Button):
     def __init__(self):
@@ -49,11 +23,8 @@ class PermissionButton(discord.ui.Button):
         )
 
         try:
-            with open('data/perm.json', 'r') as f:
-                perm = json.load(f)
-
-            owners = perm.get('owners', [])
-            permitted = perm.get('permitted', [])
+            owners = get_owners()
+            permitted = get_permitted()
 
             if owners:
                 embed.add_field(name="👑 Donos adicionais", value="\n".join([f"<@{owner}> ({owner})" for owner in owners]), inline=False)
@@ -80,11 +51,8 @@ class PermissionPanel(discord.ui.View):
 
     @discord.ui.button(label="Remover", style=discord.ButtonStyle.danger, emoji="➖")
     async def remove_permission(self, interaction: discord.Interaction, button: discord.ui.Button):
-        with open('data/perm.json', 'r') as f:
-            perm = json.load(f)
-
-        owners = perm.get('owners', [])
-        permitted = perm.get('permitted', [])
+        owners = get_owners()
+        permitted = get_permitted()
 
         if not owners and not permitted:
             embed = discord.Embed(
@@ -123,23 +91,10 @@ class AddPermissionModal(discord.ui.Modal, title='Adicionar Permissão'):
             await interaction.response.send_message('Tipo de permissão inválido. Use "owner" ou "user".', ephemeral=True)
             return
 
-        try:
-            with open('data/perm.json', 'r') as f:
-                perm = json.load(f)
-
-            if perm_type == "owner":
-                if user_id not in perm.get('owners', []):
-                    perm.setdefault('owners', []).append(user_id)
-            else:
-                if user_id not in perm.get('permitted', []):
-                    perm.setdefault('permitted', []).append(user_id)
-
-            with open('data/perm.json', 'w') as f:
-                json.dump(perm, f, indent=2)
-
-            await interaction.response.send_message(f"Permissão adicionada com sucesso para o ID {user_id}!", ephemeral=True)
-        except Exception as e:
-            await interaction.response.send_message(f"Erro ao adicionar permissão: {str(e)}", ephemeral=True)
+        if add_permission(user_id, perm_type):
+             await interaction.response.send_message(f"Permissão adicionada com sucesso para o ID {user_id}!", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Erro ao adicionar permissão.", ephemeral=True)
 
 class RemovePermissionModal(discord.ui.Modal, title='Remover Permissão'):
     user_id = discord.ui.TextInput(label='ID do Usuário', placeholder='Digite o ID do usuário a ser removido')
@@ -151,24 +106,7 @@ class RemovePermissionModal(discord.ui.Modal, title='Remover Permissão'):
             await interaction.response.send_message("ID inválido. O ID deve conter apenas números.", ephemeral=True)
             return
 
-        try:
-            with open('data/perm.json', 'r') as f:
-                perm = json.load(f)
-
-            if user_id in perm.get('owners', []):
-                perm['owners'].remove(user_id)
-                removed = True
-            elif user_id in perm.get('permitted', []):
-                perm['permitted'].remove(user_id)
-                removed = True
-            else:
-                removed = False
-
-            if removed:
-                with open('data/perm.json', 'w') as f:
-                    json.dump(perm, f, indent=2)
-                await interaction.response.send_message(f"Permissão removida com sucesso para o ID {user_id}!", ephemeral=True)
-            else:
-                await interaction.response.send_message(f"O ID {user_id} não possui permissões para serem removidas.", ephemeral=True)
-        except Exception as e:
-            await interaction.response.send_message(f"Erro ao remover permissão: {str(e)}", ephemeral=True)
+        if remove_permission(user_id):
+            await interaction.response.send_message(f"Permissão removida com sucesso para o ID {user_id}!", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"O ID {user_id} não possui permissões para serem removidas ou ocorreu um erro.", ephemeral=True)

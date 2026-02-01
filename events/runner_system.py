@@ -3,37 +3,15 @@ import threading
 import asyncio
 import time
 import random
-import yaml
 import requests
 from database.manager import Manager
-from .logs_system import stats
+from .log_system import stats
 from .token_system import tokens_index, get_id, validate_token_api, get_token_guilds
+from .config_system import load_settings
 
 system_running = False
 dm_tasks = []
 db_manager = Manager()
-
-def load_settings():
-    try:
-        with open('config/settings.yaml', encoding='utf-8') as f:
-            settings = yaml.load(f, Loader=yaml.FullLoader)
-
-        # Load message
-        with open('config/message.txt', encoding='utf-8') as f:
-            settings['message'] = f.read()
-
-        # Mask link logic
-        if settings.get('mask_link'):
-            for line in settings['message'].split():
-                if "https://discord.gg/aresrp" in line:
-                    new_link = settings.get('mask', '')
-                    new_message = settings['message'].replace(line, f"<{new_link}> ||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||")
-                    settings['message'] = new_message
-
-        return settings
-    except Exception as e:
-        print(f"Error loading settings: {e}")
-        return {}
 
 def get_emoji(settings):
     return random.choice(settings.get('reactions', ['👍', '❤️', '😂', '😮', '😢', '😡']))

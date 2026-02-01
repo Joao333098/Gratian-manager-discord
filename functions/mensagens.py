@@ -6,8 +6,9 @@ import asyncio
 import requests
 import discum
 from functions.utils import BackButton
-from events.token_system import get_id, get_token_guilds
-from events.logs_system import stats
+from events.token_system import get_id, get_token_guilds, get_all_tokens
+from events.log_system import stats
+from events.config_system import load_message, save_message
 
 class MessageButton(discord.ui.Button):
     def __init__(self):
@@ -26,11 +27,7 @@ class MessagePanel(discord.ui.View):
         self.load_current_message()
 
     def load_current_message(self):
-        try:
-            with open('config/message.txt', 'r', encoding='utf-8') as f:
-                self.current_message = f.read()
-        except:
-            self.current_message = "Nenhuma mensagem definida"
+        self.current_message = load_message() or "Nenhuma mensagem definida"
 
     @discord.ui.button(label="Ver Atual", style=discord.ButtonStyle.secondary, emoji="👀")
     async def view_message(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -54,8 +51,7 @@ class MessagePanel(discord.ui.View):
 
     @discord.ui.button(label="Deletar", style=discord.ButtonStyle.danger, emoji="🗂️")
     async def delete_message(self, interaction: discord.Interaction, button: discord.ui.Button):
-        with open('config/message.txt', 'w', encoding='utf-8') as f:
-            f.write("")
+        save_message("")
         self.current_message = ""
 
         embed = discord.Embed(
@@ -86,8 +82,7 @@ class MessageModal(discord.ui.Modal, title="Gerenciar Mensagem"):
         self.add_item(self.message)
 
     async def on_submit(self, interaction: discord.Interaction):
-        with open('config/message.txt', 'w', encoding='utf-8') as f:
-            f.write(self.message.value)
+        save_message(self.message.value)
         await interaction.response.send_message("✅ Mensagem atualizada com sucesso!", ephemeral=True)
 
 class ServerMessageButton(discord.ui.Button):
@@ -204,8 +199,7 @@ class ConfirmServerMessageView(discord.ui.View):
 
 def send_to_all_servers(message, delay, interaction, bio=None):
     try:
-        with open('config/tokens.txt', 'r') as f:
-            tokens = [token.strip() for token in f.readlines() if token.strip()]
+        tokens = get_all_tokens()
 
         if not tokens:
             stats.add_log("❌ Nenhum self-bot (token) disponível para envio")

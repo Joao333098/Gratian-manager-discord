@@ -1,17 +1,14 @@
 import discord
 import yaml
 from functions.utils import BackButton
+from events.config_system import load_settings, save_settings
 
 class SettingsButton(discord.ui.Button):
     def __init__(self):
         super().__init__(label="Configurações", style=discord.ButtonStyle.secondary, emoji="🔧")
 
     async def callback(self, interaction: discord.Interaction):
-        try:
-            with open('config/settings.yaml', 'r') as f:
-                settings = yaml.safe_load(f)
-        except:
-            settings = {}
+        settings = load_settings()
 
         embed = discord.Embed(
             title="⚙️ Configurações Avançadas do Sistema",
@@ -70,20 +67,20 @@ class SettingsDropdown(discord.ui.Select):
         elif category == "view_all": await self.show_all_settings(interaction)
 
     async def show_dm_behavior(self, interaction):
-        with open('config/settings.yaml', 'r') as f: settings = yaml.safe_load(f)
+        settings = load_settings()
         embed = discord.Embed(title="🤖 Configurações de Comportamento DM", description="Configure como o bot se comporta ao enviar DMs", color=discord.Color.green())
         view = DMBehaviorPanel(settings)
         await interaction.response.edit_message(embed=embed, view=view)
 
     async def show_performance(self, interaction):
-        with open('config/settings.yaml', 'r') as f: settings = yaml.safe_load(f)
+        settings = load_settings()
         embed = discord.Embed(title="⚡ Configurações de Performance", description="Otimize a performance e velocidade do bot", color=discord.Color.yellow())
         embed.add_field(name="⏱️ Configuração Atual", value=f"**Cooldown**: `{settings.get('dm_cooldown', 3)} segundos`", inline=False)
         view = PerformancePanel()
         await interaction.response.edit_message(embed=embed, view=view)
 
     async def show_events(self, interaction):
-        with open('config/settings.yaml', 'r') as f: settings = yaml.safe_load(f)
+        settings = load_settings()
         embed = discord.Embed(title="🎯 Configurações de Eventos", description="Configure quais eventos o bot deve monitorar", color=discord.Color.purple())
         view = EventsPanel(settings)
         await interaction.response.edit_message(embed=embed, view=view)
@@ -94,9 +91,9 @@ class SettingsDropdown(discord.ui.Select):
         await interaction.response.edit_message(embed=embed, view=view)
 
     async def show_all_settings(self, interaction):
-        with open('config/settings.yaml', 'r') as f: settings = yaml.safe_load(f)
+        settings = load_settings()
         embed = discord.Embed(title="📋 Todas as Configurações", description="Visualização completa de todas as configurações", color=discord.Color.blue())
-        config_text = "```yaml\n" + "\n".join([f"{k}: {v}" for k, v in settings.items() if k != '_']) + "```"
+        config_text = "```yaml\n" + "\n".join([f"{k}: {v}" for k, v in settings.items() if k != 'message']) + "```"
         embed.add_field(name="🔧 Configurações Atuais", value=config_text, inline=False)
         view = AllSettingsPanel()
         await interaction.response.edit_message(embed=embed, view=view)
@@ -113,9 +110,9 @@ class ToggleButton(discord.ui.Button):
         self.label = f"{self.feature_name}: {'Ativado' if self.is_active else 'Desativado'}"
         self.style = discord.ButtonStyle.green if self.is_active else discord.ButtonStyle.danger
 
-        with open('config/settings.yaml', 'r') as f: settings = yaml.safe_load(f)
+        settings = load_settings()
         settings[self.setting_key] = self.is_active
-        with open('config/settings.yaml', 'w') as f: yaml.dump(settings, f)
+        save_settings(settings)
 
         await interaction.response.edit_message(view=self.view)
         await interaction.followup.send(f"Configuração '{self.feature_name}' foi {'ativada' if self.is_active else 'desativada'}.", ephemeral=True)
@@ -160,9 +157,9 @@ class PerformancePanel(discord.ui.View):
 
     async def set_cooldown(self, interaction, cooldown_value, mode_name):
         try:
-            with open('config/settings.yaml', 'r') as f: settings = yaml.safe_load(f)
+            settings = load_settings()
             settings['dm_cooldown'] = cooldown_value
-            with open('config/settings.yaml', 'w') as f: yaml.dump(settings, f)
+            save_settings(settings)
             await interaction.response.send_message(f"✅ {mode_name} ativado! Cooldown definido para {cooldown_value} segundos.", ephemeral=True)
         except Exception as e:
             await interaction.response.send_message(f"❌ Erro ao alterar configuração: {str(e)}", ephemeral=True)
@@ -212,8 +209,8 @@ class AllSettingsPanel(discord.ui.View):
 class CooldownModal(discord.ui.Modal, title='⏱️ Ajustar Cooldown'):
     def __init__(self):
         super().__init__()
-        with open('config/settings.yaml', 'r') as f: current_settings = yaml.safe_load(f)
-        self.cooldown = discord.ui.TextInput(label='Cooldown (segundos)', placeholder='Tempo entre DMs', default=str(current_settings.get('dm_cooldown', 3)), required=True)
+        settings = load_settings()
+        self.cooldown = discord.ui.TextInput(label='Cooldown (segundos)', placeholder='Tempo entre DMs', default=str(settings.get('dm_cooldown', 3)), required=True)
         self.add_item(self.cooldown)
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -222,9 +219,9 @@ class CooldownModal(discord.ui.Modal, title='⏱️ Ajustar Cooldown'):
             if cooldown_value < 1:
                 await interaction.response.send_message("❌ Cooldown deve ser maior que 0 segundos!", ephemeral=True)
                 return
-            with open('config/settings.yaml', 'r') as f: settings = yaml.safe_load(f)
+            settings = load_settings()
             settings['dm_cooldown'] = cooldown_value
-            with open('config/settings.yaml', 'w') as f: yaml.dump(settings, f)
+            save_settings(settings)
             status = "🟢 Seguro" if cooldown_value >= 5 else "🟡 Balanceado" if cooldown_value >= 3 else "🔴 Rápido"
             await interaction.response.send_message(f"✅ Cooldown atualizado para {cooldown_value} segundos! Status: {status}", ephemeral=True)
         except ValueError:

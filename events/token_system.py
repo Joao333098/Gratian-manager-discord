@@ -1,7 +1,7 @@
 import base64
 import requests
-import sys
-from .logs_system import stats
+import os
+from .log_system import stats
 
 tokens_index = {}
 
@@ -92,3 +92,32 @@ def get_token_guilds(token):
         return response.json()
     except:
         return []
+
+def get_all_tokens():
+    try:
+        if not os.path.exists('config/tokens.txt'):
+            return []
+        with open('config/tokens.txt', 'r') as f:
+            return [token.strip() for token in f.readlines() if token.strip()]
+    except Exception as e:
+        print(f"Erro ao ler tokens: {e}")
+        return []
+
+def add_token(token):
+    try:
+        with open('config/tokens.txt', 'a') as f:
+            f.write(f"{token}\n")
+        return True
+    except Exception as e:
+        print(f"Erro ao adicionar token: {e}")
+        return False
+
+def save_tokens(tokens):
+    try:
+        with open('config/tokens.txt', 'w') as f:
+            for token in tokens:
+                f.write(f"{token}\n")
+        return True
+    except Exception as e:
+        print(f"Erro ao salvar tokens: {e}")
+        return False
