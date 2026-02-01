@@ -1,0 +1,25 @@
+dm_cooldown: 3
+dm_pin: false
+dm_reaction: false
+dm_reply: false
+dm_typing: false
+event_message: true
+event_voice: true
+mask: https://discord.gg/example
+mask_link: true
+mongo_cluster_name: collection_name
+mongo_db_url: mongodb+srv://user:pass@cluster.mongodb.net/db
+reactions:
+- "❤️"
+- "😘"
+- "😍"
+- "💓"
+- "💖"
+- "🥰"
+reply_messages:
+- Hello
+- I am not a bot
+selfbot_enabled: true
+selfbot_messages:
+- Hi!
+- How are you?
